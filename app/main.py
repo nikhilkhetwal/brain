@@ -5,16 +5,26 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 import streamlit as st
+import requests
 
+# URL to the raw model file on GitHub
+model_url = "https://github.com/nikhilkhetwal/brain/raw/main/app/trained_model/Brain_Tumor.h5"
 
-working_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = f"{working_dir}/trained_model/Brain_Tumor.h5"
-# Load the pre-trained model
-model = tf.keras.models.load_model(model_path)
+# Download the model file locally
+model_filename = "Brain_Tumor.h5"
+with open(model_filename, "wb") as f:
+    response = requests.get(model_url)
+    f.write(response.content)
 
-# loading the class names
-class_indices = json.load(open(f"{working_dir}/class_indices.json"))
+# Load the model from the local file
+model = tf.keras.models.load_model(model_filename)
 
+# URL to the raw class indices file on GitHub
+class_indices_url = "https://raw.githubusercontent.com/nikhilkhetwal/brain/main/app/class_indices.json"
+
+# Load the class indices from the raw GitHub URL
+response = requests.get(class_indices_url)
+class_indices = json.loads(response.content)
 
 # Function to Load and Preprocess the Image using Pillow
 def load_and_preprocess_image(image_path, target_size=(224, 224)):
